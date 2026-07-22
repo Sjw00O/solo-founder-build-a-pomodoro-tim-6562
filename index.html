@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro Timer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0d0d0d;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+      color: #e0e0e0;
+      transition: background 0.5s ease;
+    }
+    .container {
+      background: rgba(20, 20, 30, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 48px;
+      padding: 2.5rem 3rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      max-width: 480px;
+      width: 90%;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.3s;
+    }
+    h1 {
+      font-weight: 300;
+      font-size: 1.5rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: #aaa;
+      margin-bottom: 1.8rem;
+    }
+    .timer-display {
+      font-size: 5.5rem;
+      font-weight: 200;
+      letter-spacing: 6px;
+      font-variant-numeric: tabular-nums;
+      color: #f0f0f0;
+      text-shadow: 0 0 40px rgba(100, 140, 255, 0.15);
+      margin-bottom: 2.2rem;
+      line-height: 1.2;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #ccc;
+      padding: 0.7rem 2.2rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+      text-transform: uppercase;
+    }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transform: scale(1.02);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .btn-primary {
+      background: rgba(80, 120, 255, 0.2);
+      border-color: rgba(80, 120, 255, 0.3);
+      color: #b0c4ff;
+    }
+    .btn-primary:hover {
+      background: rgba(80, 120, 255, 0.35);
+      border-color: rgba(80, 120, 255, 0.5);
+      color: #fff;
+    }
+    .btn-danger {
+      background: rgba(255, 80, 80, 0.15);
+      border-color: rgba(255, 80, 80, 0.2);
+      color: #ff9e9e;
+    }
+    .btn-danger:hover {
+      background: rgba(255, 80, 80, 0.3);
+      border-color: rgba(255, 80, 80, 0.4);
+      color: #fff;
+    }
+    .mode-label {
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 1.5rem;
+      padding: 0.4rem 1rem;
+      display: inline-block;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .ambient-section {
+      margin-top: 1.8rem;
+      padding-top: 1.8rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .ambient-title {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: #666;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .sound-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .sound-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #999;
+      padding: 0.5rem 1.4rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .sound-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ddd;
+    }
+    .sound-btn.active {
+      background: rgba(100, 180, 255, 0.15);
+      border-color: rgba(100, 180, 255, 0.3);
+      color: #b0d0ff;
+      box-shadow: 0 0 20px rgba(100, 180, 255, 0.05);
+    }
+    .volume-slider {
+      margin-top: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+    .volume-slider input {
+      width: 120px;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      outline: none;
+    }
+    .volume-slider input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #8ab4ff;
+      cursor: pointer;
+      border: 2px solid #1a1a2e;
+      box-shadow: 0 0 8px rgba(100, 140, 255, 0.3);
+    }
+    .volume-slider input::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #8ab4ff;
+      cursor: pointer;
+      border: 2px solid #1a1a2e;
+    }
+    .volume-label {
+      font-size: 0.7rem;
+      color: #777;
+      letter-spacing: 1px;
+    }
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.6rem;
+      color: #444;
+      letter-spacing: 1px;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 1.8rem 1.5rem;
+      }
+      .timer-display {
+        font-size: 4rem;
+      }
+      .controls {
+        gap: 0.8rem;
+      }
+      .btn {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Pomodoro</h1>
+    <div class="mode-label" id="modeLabel">Focus</div>
+    <div class="timer-display" id="timerDisplay">25:00</div>
+    <div class="controls">
+      <button class="btn btn-primary" id="startBtn">Start</button>
+      <button class="btn" id="pauseBtn">Pause</button>
+      <button class="btn btn-danger" id="resetBtn">Reset</button>
+    </div>
+    <div class="ambient-section">
+      <div class="ambient-title">Ambient Sound</div>
+      <div class="sound-buttons">
+        <button class="sound-btn active" data-sound="rain">Rain</button>
+        <button class="sound-btn" data-sound="ocean">Ocean</button>
+        <button class="sound-btn" data-sound="fire">Fire</button>
+        <button class="sound-btn" data-sound="birds">Birds</button>
+      </div>
+      <div class="volume-slider">
+        <span class="volume-label">Vol</span>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.3">
+        <span class="volume-label" id="volumeValue">30%</span>
+      </div>
+    </div>
+    <div class="footer">focus · flow · repeat</div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- Timer State ----------
+      const WORK_TIME = 25 * 60; // 25 min
+      const BREAK_TIME = 5 * 60;  // 5 min
+
+      let timeLeft = WORK_TIME;
+      let isRunning = false;
+      let isWorkMode = true;
+      let intervalId = null;
+
+      // DOM refs
+      const timerDisplay = document.getElementById('timerDisplay');
+      const modeLabel = document.getElementById('modeLabel');
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const volumeSlider = document.getElementById('volumeSlider');
+      const volumeValue = document.getElementById('volumeValue');
+
+      // ---------- Audio Engine (Web Audio + Howler-like simple) ----------
+      // We'll use AudioContext + OscillatorNode for procedural sounds (no external files)
+      // Rain: white noise filtered, Ocean: low brown noise, Fire: crackle noise, Birds: high chirps
+      let audioCtx = null;
+      let currentSound = 'rain';
+      let isSoundPlaying = false;
+      let soundNodes = []; // to stop
+      let gainNode = null;
+      let volume = 0.3;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          gainNode = audioCtx.createGain();
+          gainNode.gain.value = volume;
+          gainNode.connect(audioCtx.destination);
+        }
+      }
+
+      // White noise buffer (rain)
+      function createNoiseBuffer(durationSec = 0.5) {
+        const sampleRate = audioCtx.sampleRate;
+        const length = sampleRate * durationSec;
+        const buffer = audioCtx.createBuffer(1, length, sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < length; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        return buffer;
+      }
+
+      function startRain() {
+        const buffer = createNoiseBuffer(1);
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        // Filter to make it softer
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 1200;
+        filter.Q.value = 0.7;
+        source.connect(filter);
+        filter.connect(gainNode);
+        source.start();
+        soundNodes.push(source);
+        // Additional layered noise for richness
+        const buffer2 = createNoiseBuffer(0.7);
+        const source2 = audioCtx.createBufferSource();
+        source2.buffer = buffer2;
+        source2.loop = true;
+        const filter2 = audioCtx.createBiquadFilter();
+        filter2.type = 'lowpass';
+        filter2.frequency.value = 600;
+        filter2.Q.value = 0.5;
+        source2.connect(filter2);
+        filter2.connect(gainNode);
+        source2.start();
+        soundNodes.push(source2);
+      }
+
+      function startOcean() {
+        // Brown noise: integrate white noise
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let lastOut = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          data[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = data[i];
+          data[i] *= 3.5; // amplify
+        }
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 400;
+        filter.Q.value = 1.0;
+        source.connect(filter);
+        filter.connect(gainNode);
+        source.start();
+        soundNodes.push(source);
+      }
+
+      function startFire() {
+        // Crackle: short noise bursts
+        const bufferSize = audioCtx.sampleRate * 0.05;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        const source = audioCtx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        // Bandpass for crackle
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 2000;
+        filter.Q.value = 0.5;
+        source.connect(filter);
+        filter.connect(gainNode);
+        source.start();
+        soundNodes.push(source);
+        // Add a low rumble
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.value = 80;
+        const gain2 = audioCtx.createGain();
+        gain2.gain.value = 0.08;
+        osc.connect(gain2);
+        gain2.connect(gainNode);
+        osc.start();
+        soundNodes.push(osc);
+      }
+
+      function startBirds() {
+        // High-pitched chirps with modulation
+        const osc1 = audioCtx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.value = 2000;
+        const gain1 = audioCtx.createGain();
+        gain1.gain.value = 0.15;
+        const lfo = audioCtx.createOscillator();
+        lfo.frequency.value = 6;
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 600;
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc1.frequency);
+        osc1.connect(gain1);
+        gain1.connect(gainNode);
+        osc1.start();
+        lfo.start();
+        soundNodes.push(osc1);
+        soundNodes.push(lfo);
+
+        // Second bird
+        const osc2 = audioCtx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.value = 2800;
+        const gain2 = audioCtx.createGain();
+        gain2.gain.value = 0.08;
+        const lfo2 = audioCtx.createOscillator();
+        lfo2.frequency.value = 4.5;
+        const lfoGain2 = audioCtx.createGain();
+        lfoGain2.gain.value = 500;
+        lfo2.connect(lfoGain2);
+        lfoGain2.connect(osc2.frequency);
+        osc2.connect(gain2);
+        gain2.connect(gainNode);
+        osc2.start();
+        lfo2.start();
+        soundNodes.push(osc2);
+        soundNodes.push(lfo2);
+      }
+
+      function stopAllSounds() {
+        soundNodes.forEach(node => {
+          try {
+            node.stop();
+            node.disconnect();
+          } catch(e) {}
+        });
+        soundNodes = [];
+        isSoundPlaying = false;
+      }
+
+      function playSound(soundName) {
+        if (!audioCtx) initAudio();
+        stopAllSounds();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        switch(soundName) {
+          case 'rain': startRain(); break;
+          case 'ocean': startOcean(); break;
+          case 'fire': startFire(); break;
+          case 'birds': startBirds(); break;
+          default: startRain();
+        }
+        isSoundPlaying = true;
+        currentSound = soundName;
+      }
+
+      function updateVolume(val) {
+        volume = parseFloat(val);
+        if (gainNode) {
+          gainNode.gain.value = volume;
+        }
+        volumeValue.textContent = Math.round(volume * 100) + '%';
+      }
+
+      // Sound mode switching based on timer mode
+      function updateSoundForMode(workMode) {
+        const soundMap = {
+          work: 'rain',
+          break: 'birds'
+        };
+        const desired = workMode ? 'rain' : 'birds';
+        // Only switch if not already playing desired sound
+        if (currentSound !== desired) {
+          playSound(desired);
+        }
+        // Update active button
+        document.querySelectorAll('.sound-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.sound === desired);
+        });
